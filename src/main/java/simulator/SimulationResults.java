@@ -1,7 +1,6 @@
 package simulator;
 
 import com.google.common.collect.ImmutableList;
-import simulator.output.IgnoredInputWarning;
 import simulator.output.Trade;
 
 /**
@@ -10,18 +9,18 @@ import simulator.output.Trade;
 public class SimulationResults {
 
     private final ImmutableList<Trade> orders;
-    private final ImmutableList<IgnoredInputWarning> ignoredInputWarnings;
+    private final ImmutableList<String> warnings;
 
-    public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<IgnoredInputWarning> ignoredInputWarnings) {
+    public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<String> warnings) {
         this.orders = orders;
-        this.ignoredInputWarnings = ignoredInputWarnings;
+        this.warnings = warnings;
     }
 
     public ImmutableList<Trade> getOrders() {
         return orders;
     }
 
-    public ImmutableList<IgnoredInputWarning> getIgnoredInputWarnings() {
-        return ignoredInputWarnings;
+    public ImmutableList<String> getWarnings() {
+        return warnings;
     }
 }
