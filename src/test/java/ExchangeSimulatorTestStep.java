@@ -12,10 +12,10 @@ import static org.hamcrest.Matchers.empty;
 /**
  * Created by adam on 1/22/17.
  */
-abstract class ExchangeSimulatorTestCase {
+abstract class ExchangeSimulatorTestStep {
     private final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness;
 
-    public ExchangeSimulatorTestCase(final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness) {
+    public ExchangeSimulatorTestStep(final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness) {
         this.exchangeSimulatorTestHarness = exchangeSimulatorTestHarness;
     }
 
@@ -36,7 +36,7 @@ abstract class ExchangeSimulatorTestCase {
     /**
      * Performs the test. The test steps
      */
-    protected final void performTest() {
+    protected final void performStep() {
         final ImmutableList.Builder orderListBuilder = ImmutableList.builder();
         populateOrders(orderListBuilder);
 

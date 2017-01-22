@@ -22,13 +22,13 @@ final class RunnableStreamReader implements Runnable {
     }
 
     public void run() {
-        final BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream));
-        String output = null;
 
-        try {
+        String output = null;
+        try (final BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream))) {
             while ((output = streamReader.readLine()) != null) {
                 System.out.println(output);
                 readLines.add(output);
+                System.out.println(readLines.size());
             }
         } catch (final IOException e) {
             System.out.println(e.getStackTrace());

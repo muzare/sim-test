@@ -8,14 +8,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 /**
  * Contains tests for verifying the behavior of the exchange simulator when given invalid inputs.
  */
-public final class ValidationTest extends ExchangeSimulatorTestHarness {
+public final class OrderValidationTest extends ExchangeSimulatorTestHarness {
 
     /**
      * Verifies that an order containing a zero price causes the exchange simulation to abort.
      */
     @Test
     public void zeroPrice() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withPrice(0.0);
@@ -25,7 +25,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -33,7 +34,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void negativePrice() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withPrice(-148.0);
@@ -43,7 +44,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -51,7 +53,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void zeroQuantity() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withQuantity(0);
@@ -61,7 +63,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -69,7 +72,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void negativeQuantity() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withQuantity(-100);
@@ -79,7 +82,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -87,7 +91,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void emptySymbol() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withSymbol("");
@@ -97,7 +101,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -105,7 +110,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void symbolWithOverSixCharacters() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withSymbol("IBMIBMI");
@@ -115,7 +120,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected boolean shouldProcessAbort() {
                 return true;
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -123,7 +129,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void emptyAction() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withAction("");
@@ -133,7 +139,8 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected Matcher<String>[] getWarningMatchers() {
                 return new Matcher[]{equalTo("invalid side: ")};
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
     /**
@@ -141,7 +148,7 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
      */
     @Test
     public void unrecognizedAction() {
-        new ValidationTestCase() {
+        registerTestStep(new ValidationTestStep() {
 
             protected void invalidateOrder(final Order.Builder orderBuilder) {
                 orderBuilder.withAction("EAT");
@@ -151,13 +158,14 @@ public final class ValidationTest extends ExchangeSimulatorTestHarness {
             protected Matcher<String>[] getWarningMatchers() {
                 return new Matcher[]{equalTo("invalid side: EAT")};
             }
-        }.performTest();
+        });
+        performTestSteps();
     }
 
-    protected abstract class ValidationTestCase extends ExchangeSimulatorTestCase {
+    protected abstract class ValidationTestStep extends ExchangeSimulatorTestStep {
 
-        public ValidationTestCase() {
-            super(ValidationTest.this);
+        public ValidationTestStep() {
+            super(OrderValidationTest.this);
         }
 
         protected abstract void invalidateOrder(final Order.Builder orderBuilder);
