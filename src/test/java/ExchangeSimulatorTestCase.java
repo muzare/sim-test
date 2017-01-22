@@ -12,11 +12,11 @@ import static org.hamcrest.Matchers.empty;
 /**
  * Created by adam on 1/22/17.
  */
-abstract class TestPlan {
-    private final ValidationTest validationTest;
+abstract class ExchangeSimulatorTestCase {
+    private final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness;
 
-    public TestPlan(final ValidationTest validationTest) {
-        this.validationTest = validationTest;
+    public ExchangeSimulatorTestCase(final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness) {
+        this.exchangeSimulatorTestHarness = exchangeSimulatorTestHarness;
     }
 
     protected abstract void populateOrders(final ImmutableList.Builder<Order> orderListBuilder);
@@ -33,12 +33,14 @@ abstract class TestPlan {
         return false;
     }
 
-
+    /**
+     * Performs the test. The test steps
+     */
     protected final void performTest() {
         final ImmutableList.Builder orderListBuilder = ImmutableList.builder();
         populateOrders(orderListBuilder);
 
-        final SimulationResults simulationResults = validationTest.simulatorRuntime.getSimulator().processOrders(orderListBuilder.build());
+        final SimulationResults simulationResults = exchangeSimulatorTestHarness.simulatorRuntime.getSimulator().processOrders(orderListBuilder.build());
 
         final Matcher<Trade>[] tradeMatchers = getTradeMatchers();
         if (tradeMatchers.length == 0) {

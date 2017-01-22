@@ -1,30 +1,60 @@
 import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matcher;
-import org.joda.time.Seconds;
-import org.junit.Rule;
 import org.junit.Test;
-import simulator.ExchangeSimulatorRuntime;
 import simulator.input.Order;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
- * Created by adam on 1/21/17.
+ * Contains tests for verifying the behavior of the exchange simulator when given invalid inputs.
  */
-public class ValidationTest {
+public final class ValidationTest extends ExchangeSimulatorTestHarness {
 
-    @Rule
-    public final ExchangeSimulatorRuntime simulatorRuntime = new ExchangeSimulatorRuntime(Seconds.TWO);
+    /**
+     * Verifies that an order containing a zero price causes the exchange simulation to abort.
+     */
+    @Test
+    public void zeroPrice() {
+        new ValidationTestCase() {
+
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withPrice(0.0);
+            }
+
+            @Override
+            protected boolean shouldProcessAbort() {
+                return true;
+            }
+        }.performTest();
+    }
 
     /**
      * Verifies that an order containing a negative price causes the exchange simulation to abort.
      */
     @Test
     public void negativePrice() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("IBM").withAction("SELL").withPrice(-145.09).withQuantity(100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withPrice(-148.0);
+            }
+
+            @Override
+            protected boolean shouldProcessAbort() {
+                return true;
+            }
+        }.performTest();
+    }
+
+    /**
+     * Verifies that an order containing a zero quantity causes the exchange simulation to abort.
+     */
+    @Test
+    public void zeroQuantity() {
+        new ValidationTestCase() {
+
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withQuantity(0);
             }
 
             @Override
@@ -39,10 +69,10 @@ public class ValidationTest {
      */
     @Test
     public void negativeQuantity() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("IBM").withAction("SELL").withPrice(145.09).withQuantity(-100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withQuantity(-100);
             }
 
             @Override
@@ -57,10 +87,10 @@ public class ValidationTest {
      */
     @Test
     public void emptySymbol() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("").withAction("SELL").withPrice(145.09).withQuantity(100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withSymbol("");
             }
 
             @Override
@@ -70,16 +100,15 @@ public class ValidationTest {
         }.performTest();
     }
 
-
     /**
      * Verifies that an order containing an symbol with more than six characters causes the exchange simulation to abort.
      */
     @Test
     public void symbolWithOverSixCharacters() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("IBMIBMI").withAction("SELL").withPrice(145.09).withQuantity(100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withSymbol("IBMIBMI");
             }
 
             @Override
@@ -94,10 +123,10 @@ public class ValidationTest {
      */
     @Test
     public void emptyAction() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("IBM").withAction("").withPrice(145.09).withQuantity(100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withAction("");
             }
 
             @Override
@@ -112,10 +141,10 @@ public class ValidationTest {
      */
     @Test
     public void unrecognizedAction() {
-        new TestPlan(this) {
+        new ValidationTestCase() {
 
-            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder.add(Order.Builder.create().withSymbol("IBM").withAction("EAT").withPrice(145.09).withQuantity(100).build());
+            protected void invalidateOrder(final Order.Builder orderBuilder) {
+                orderBuilder.withAction("EAT");
             }
 
             @Override
@@ -125,4 +154,19 @@ public class ValidationTest {
         }.performTest();
     }
 
+    protected abstract class ValidationTestCase extends ExchangeSimulatorTestCase {
+
+        public ValidationTestCase() {
+            super(ValidationTest.this);
+        }
+
+        protected abstract void invalidateOrder(final Order.Builder orderBuilder);
+
+        @Override
+        protected final void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
+            final Order.Builder validOrder = Order.Builder.create().withSymbol("IBM").withAction("SELL").withPrice(145.09).withQuantity(100);
+            invalidateOrder(validOrder);
+            orderListBuilder.add(validOrder.build());
+        }
+    }
 }

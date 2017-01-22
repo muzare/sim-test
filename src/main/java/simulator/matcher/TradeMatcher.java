@@ -22,6 +22,9 @@ public class TradeMatcher extends TypeSafeDiagnosingMatcher<Trade> {
         quantityMatcher = equalTo(Long.valueOf(expectedQuantity));
     }
 
+    /**
+     * @inheritDoc
+     */
     protected boolean matchesSafely(final Trade actualTrade, final Description description) {
         boolean matches = true;
 
@@ -40,6 +43,9 @@ public class TradeMatcher extends TypeSafeDiagnosingMatcher<Trade> {
         return matches;
     }
 
+    /**
+     * @inheritDoc
+     */
     public void describeTo(final Description description) {
         description.appendDescriptionOf(symbolMatcher).appendDescriptionOf(quantityMatcher).appendDescriptionOf(priceMatcher);
     }

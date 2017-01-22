@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.joda.time.Seconds;
 import simulator.exception.HarnessInitializationError;
 import simulator.exception.OrderProcessInputError;
+import simulator.exception.SimulationTerminationError;
 import simulator.input.Order;
 import simulator.output.Trade;
 
@@ -26,7 +27,9 @@ public final class ExchangeSimulator {
 
     public SimulationResults processOrders(final List<Order> orders) {
         try {
-            processInputWriter.write(translateCommands(orders));
+            final String commands = translateCommands(orders);
+            System.out.println(commands);
+            processInputWriter.write(commands);
             processInputWriter.flush();
         } catch (final IOException exception) {
             throw new OrderProcessInputError(exception);
@@ -71,8 +74,8 @@ public final class ExchangeSimulator {
         simulator.destroy();
         try {
             processInputWriter.close();
-        } catch (final IOException e) {
-            e.printStackTrace();
+        } catch (final IOException exception) {
+            throw new SimulationTerminationError(exception);
         }
     }
 

@@ -4,17 +4,16 @@ package simulator.output;
  * Created by adam on 1/21/17.
  */
 public class Trade {
+
     private final String symbol;
     private final Double price;
     private final Long quantity;
 
     public String getSymbol() {
-
         return symbol;
     }
 
     public Double getPrice() {
-
         return price;
     }
 
