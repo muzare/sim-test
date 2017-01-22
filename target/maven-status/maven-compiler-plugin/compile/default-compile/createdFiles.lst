@@ -1,0 +1,6 @@
+simulator/transaction/BuyTransaction.class
+simulator/ExchangeSimulator.class
+simulator/Order.class
+simulator/transaction/TransactionType.class
+simulator/transaction/ExchangeTransaction.class
+simulator/transaction/SellTransaction.class
