@@ -10,10 +10,18 @@ public class SimulationResults {
 
     private final ImmutableList<Trade> orders;
     private final ImmutableList<String> warnings;
+    private final boolean processAborted;
 
     public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<String> warnings) {
         this.orders = orders;
         this.warnings = warnings;
+        this.processAborted = false;
+    }
+
+    public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<String> warnings, final boolean processAborted) {
+        this.orders = orders;
+        this.warnings = warnings;
+        this.processAborted = processAborted;
     }
 
     public ImmutableList<Trade> getOrders() {
@@ -22,5 +30,9 @@ public class SimulationResults {
 
     public ImmutableList<String> getWarnings() {
         return warnings;
+    }
+
+    public boolean isProcessAborted() {
+        return processAborted;
     }
 }

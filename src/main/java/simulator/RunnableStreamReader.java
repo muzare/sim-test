@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * Created by adam on 1/21/17.
  */
-public final class RunnableStreamReader implements Runnable {
+final class RunnableStreamReader implements Runnable {
 
     private final InputStream inputStream;
     private final List<String> readLines = Lists.newArrayList();
 
-    public RunnableStreamReader(final InputStream inputStream) {
+    RunnableStreamReader(final InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
@@ -35,7 +35,7 @@ public final class RunnableStreamReader implements Runnable {
         }
     }
 
-    public ImmutableList<String> getReadLines() {
+    ImmutableList<String> getReadLines() {
         return ImmutableList.copyOf(readLines);
     }
 }

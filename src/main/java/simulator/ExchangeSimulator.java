@@ -49,6 +49,9 @@ public final class ExchangeSimulator {
             e.printStackTrace();
         }
 
+        if (!simulator.isAlive()) {
+            return new SimulationResults(parseTrades(standardOut.getReadLines()), standardErr.getReadLines(), true);
+        }
         return new SimulationResults(parseTrades(standardOut.getReadLines()), standardErr.getReadLines());
     }
 
@@ -84,7 +87,7 @@ public final class ExchangeSimulator {
     private static ImmutableList<Trade> parseTrades(final List<String> trades) {
         final ImmutableList.Builder translatedTrades = ImmutableList.builder();
         for (final String trade : trades) {
-            final List<String> tokens = Arrays.asList(trade.split("|"));
+            final List<String> tokens = Arrays.asList(trade.split("\\|"));
             final Iterator<String> iterator = tokens.iterator();
 
             final String symbol = iterator.hasNext() ? iterator.next() : null;
