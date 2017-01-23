@@ -1,27 +1,32 @@
 package simulator;
 
-import org.joda.time.Seconds;
 import org.junit.rules.ExternalResource;
 
 /**
- * Created by adam on 1/21/17.
+ * ExternalResource for tests running the {@link ExchangeSimulator}. Guarantees proper initialization and cleanup of the simulation.
  */
 public final class ExchangeSimulatorRuntime extends ExternalResource {
 
-    private final Seconds processingGracePeriod;
-
-    public ExchangeSimulatorRuntime(final Seconds processingGracePeriod) {
-        this.processingGracePeriod = processingGracePeriod;
+    /**
+     * Constructs a new {@link ExchangeSimulatorRuntime}.
+     */
+    public ExchangeSimulatorRuntime() {
     }
 
     private ExchangeSimulator simulator;
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void before() throws Throwable {
         super.before();
-        simulator = ExchangeSimulator.createSimulation(processingGracePeriod);
+        simulator = ExchangeSimulator.createSimulation();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void after() {
         try {
@@ -31,6 +36,11 @@ public final class ExchangeSimulatorRuntime extends ExternalResource {
         }
     }
 
+    /**
+     * Accesses the running simulator.
+     *
+     * @return Non-null {@link ExchangeSimulator} for this runtime.
+     */
     public ExchangeSimulator getSimulator() {
         return simulator;
     }

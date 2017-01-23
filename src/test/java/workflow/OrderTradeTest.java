@@ -9,7 +9,7 @@ import simulator.matcher.TradeMatcher;
 import simulator.output.Trade;
 
 /**
- * Created by adam on 1/21/17.
+ * Contains tests for valid order/trade scenarios.
  */
 public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
 
@@ -33,7 +33,7 @@ public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
     }
 
     /**
-     * Verifies that, when a BUY order comes in, but no quantities are available, no trades are attempted.
+     * Verifies that, although a SELL order has been processed, a subsequent BUY with a different symbol does not result in a trade.
      */
     @Test
     public void noTradeOccursForMismatchingSymbols() {
@@ -207,7 +207,7 @@ public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
     /**
      * Verifies that, given a SELL order and a BUY order with a lower fractional value but a higher whole number value, no trade occurs.
      * <p/>
-     * It may be that I'm naive here, but it seems to me like this is not the desired behavior.
+     * It may be that I'm ignorant as to the meaning of these prices, but it seems to me like this is not the desired behavior.
      */
     @Test
     public void wholeNumberPriceDifferenceIgnored() {
@@ -226,7 +226,7 @@ public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
         });
         performTestSteps();
     }
-    
+
     /**
      * Verifies that, when a SELL comes in with a price equal to the price of a resting order, a trade occurs.
      */
@@ -247,6 +247,8 @@ public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
             }
         });
 
+        // In this test and subsequent tests, the input is staggered into two separate calls. In retrospect, this is probably unnecessary complexity. It's not a
+        // very effective test, yet, there is some merit to testing the behavior in this fashion in case data does not persist properly across inputs.
         registerTestStep(new OrderTestStep() {
 
             protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
@@ -332,6 +334,7 @@ public final class OrderTradeTest extends ExchangeSimulatorTestHarness {
         performTestSteps();
     }
 
+    
     private abstract class OrderTestStep extends harness.ExchangeSimulatorTestStep {
 
         /**

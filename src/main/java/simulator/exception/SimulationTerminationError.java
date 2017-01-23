@@ -1,7 +1,7 @@
 package simulator.exception;
 
 /**
- * Created by adam on 1/22/17.
+ * RuntimeException indicating an exception occurred during simulation termination.
  */
 public class SimulationTerminationError extends RuntimeException {
     public SimulationTerminationError(final Throwable cause) {

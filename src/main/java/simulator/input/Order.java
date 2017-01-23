@@ -1,7 +1,7 @@
 package simulator.input;
 
 /**
- * Created by adam on 1/21/17.
+ * Represents an order sent to the exchange simulator.
  */
 public class Order {
 
@@ -26,6 +26,9 @@ public class Order {
         return quantity;
     }
 
+    /**
+     * Fluent-builder class for constructing {@link Order} objects.
+     */
     public static class Builder {
 
         private String symbol = "";
@@ -65,6 +68,9 @@ public class Order {
         }
     }
 
+    /**
+     * Private constructor to prevent direct instantiation (use #Builder).
+     */
     private Order(final String symbol, final String action, final double price, final long quantity) {
         this.symbol = symbol;
         this.action = action;

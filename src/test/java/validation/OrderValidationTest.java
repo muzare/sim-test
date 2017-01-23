@@ -172,8 +172,18 @@ public final class OrderValidationTest extends ExchangeSimulatorTestHarness {
             super(OrderValidationTest.this);
         }
 
+        /**
+         * Tests should implement this to modify the given builder such that the resulting Order is expected to be invalid. By default, the builder is populated with
+         * valid values.
+         *
+         * @param orderBuilder Non-null {@link Order.Builder} constructed with initial, valid values.
+         */
         protected abstract void invalidateOrder(final Order.Builder orderBuilder);
 
+        /**
+         * @inheritDoc <p />
+         * Populates the given ImmutableList.Builder with the invalid order created through {@link #invalidateOrder(Order.Builder)}.
+         */
         @Override
         protected final void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
             final Order.Builder validOrder = Order.Builder.create().withSymbol("IBM").withAction("SELL").withPrice(145.09).withQuantity(100);

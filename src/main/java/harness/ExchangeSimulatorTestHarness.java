@@ -1,7 +1,6 @@
 package harness;
 
 import com.google.common.collect.Lists;
-import org.joda.time.Seconds;
 import org.junit.After;
 import org.junit.Rule;
 import simulator.ExchangeSimulatorRuntime;
@@ -18,7 +17,7 @@ public abstract class ExchangeSimulatorTestHarness {
      * Rule that wraps the simulator client, ensuring the process is torn down and re-initialized after each test run.
      */
     @Rule
-    public final ExchangeSimulatorRuntime simulatorRuntime = new ExchangeSimulatorRuntime(Seconds.THREE);
+    public final ExchangeSimulatorRuntime simulatorRuntime = new ExchangeSimulatorRuntime();
 
     @After
     public final void clearTestSteps() {

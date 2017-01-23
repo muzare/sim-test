@@ -8,9 +8,9 @@ import simulator.output.Trade;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
- * Created by adam on 1/22/17.
+ * Hamcrest Matcher for matching against {@link Trade} objects output by the exchange simulator.
  */
-public class TradeMatcher extends TypeSafeDiagnosingMatcher<Trade> {
+public final class TradeMatcher extends TypeSafeDiagnosingMatcher<Trade> {
 
     private final Matcher<String> symbolMatcher;
     private final Matcher<Double> priceMatcher;

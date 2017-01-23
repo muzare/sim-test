@@ -4,19 +4,13 @@ import com.google.common.collect.ImmutableList;
 import simulator.output.Trade;
 
 /**
- * Created by adam on 1/21/17.
+ * Represents the results of a call to the {@link ExchangeSimulator}.
  */
-public class SimulationResults {
+public final class SimulationResults {
 
     private final ImmutableList<Trade> orders;
     private final ImmutableList<String> warnings;
     private final boolean processAborted;
-
-    public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<String> warnings) {
-        this.orders = orders;
-        this.warnings = warnings;
-        this.processAborted = false;
-    }
 
     public SimulationResults(final ImmutableList<Trade> orders, final ImmutableList<String> warnings, final boolean processAborted) {
         this.orders = orders;
