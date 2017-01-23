@@ -24,7 +24,7 @@ public class SimulationResults {
         this.processAborted = processAborted;
     }
 
-    public ImmutableList<Trade> getOrders() {
+    public ImmutableList<Trade> getTrades() {
         return orders;
     }
 

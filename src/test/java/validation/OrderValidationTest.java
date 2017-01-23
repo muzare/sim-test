@@ -1,4 +1,8 @@
+package validation;
+
 import com.google.common.collect.ImmutableList;
+import harness.ExchangeSimulatorTestHarness;
+import harness.ExchangeSimulatorTestStep;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import simulator.input.Order;
@@ -162,7 +166,7 @@ public final class OrderValidationTest extends ExchangeSimulatorTestHarness {
         performTestSteps();
     }
 
-    protected abstract class ValidationTestStep extends ExchangeSimulatorTestStep {
+    private abstract class ValidationTestStep extends ExchangeSimulatorTestStep {
 
         public ValidationTestStep() {
             super(OrderValidationTest.this);

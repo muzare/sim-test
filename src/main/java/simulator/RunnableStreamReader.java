@@ -22,11 +22,13 @@ final class RunnableStreamReader implements Runnable {
     }
 
     public void run() {
-
         String output = null;
         try (final BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream))) {
             while ((output = streamReader.readLine()) != null) {
                 System.out.println(output);
+                if (output.isEmpty()) {
+                    break;
+                }
                 readLines.add(output);
                 System.out.println(readLines.size());
             }
@@ -37,5 +39,9 @@ final class RunnableStreamReader implements Runnable {
 
     ImmutableList<String> getReadLines() {
         return ImmutableList.copyOf(readLines);
+    }
+
+    void flush() {
+        readLines.clear();
     }
 }

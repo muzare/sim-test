@@ -1,4 +1,8 @@
+package workflow;
+
 import com.google.common.collect.ImmutableList;
+import harness.ExchangeSimulatorTestHarness;
+import harness.ExchangeSimulatorTestStep;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import simulator.input.Order;
@@ -201,7 +205,7 @@ public final class OrderProcessingTest extends ExchangeSimulatorTestHarness {
     }
 
     /**
-     * Verifies that, when a BUY order comes in with a lower quantity than the current capacity for trading, the trade occurs with the BUY quantity.
+     * Verifies that, when a SELL comes in with a price equal to the price of a resting order, a trade occurs.
      */
     @Test
     public void restingOrder() {
@@ -223,17 +227,84 @@ public final class OrderProcessingTest extends ExchangeSimulatorTestHarness {
         registerTestStep(new ValidOrderTestStep() {
 
             protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
-                orderListBuilder
-                        .add(createDefaultSellOrder().withPrice(145.09).withQuantity(100).build());
+                orderListBuilder.add(createDefaultSellOrder().withPrice(145.09).withQuantity(100).build());
             }
 
             @Override
             protected Matcher<Trade>[] getTradeMatchers() {
-                // Note that two are needed here since the process input reader is not currently set up to reset between invocations.
-                // The first trade is the one from the previous input, and the second is the new one.
-                // TODO: mess with the mark/reset methods to figure out how to improve this so the previous input is effectively flushed.
-                final TradeMatcher expectedTrade = new TradeMatcher(DEFAULT_SYMBOL, 145.09, 100);
-                return new Matcher[]{expectedTrade, expectedTrade};
+                return new Matcher[]{new TradeMatcher(DEFAULT_SYMBOL, 145.09, 100)};
+            }
+        });
+        performTestSteps();
+    }
+
+
+    /**
+     * Verifies that, when a SELL order comes in while there are multipleresting BUY orders with higher but disparate prices, the highest-priced BUY's trade first.
+     */
+    @Test
+    public void highestBuySellsFirst() {
+        registerTestStep(new ValidOrderTestStep() {
+
+            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
+                orderListBuilder
+                        .add(createDefaultBuyOrder().withPrice(145.1).withQuantity(200).build())
+                        .add(createDefaultBuyOrder().withPrice(145.08).withQuantity(200).build())
+                        .add(createDefaultBuyOrder().withPrice(145.09).withQuantity(200).build());
+            }
+
+            @Override
+            protected Matcher<Trade>[] getTradeMatchers() {
+                return new Matcher[]{};
+            }
+        });
+
+        registerTestStep(new ValidOrderTestStep() {
+
+            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
+                orderListBuilder.add(createDefaultSellOrder().withPrice(145.05).withQuantity(600).build());
+            }
+
+            @Override
+            protected Matcher<Trade>[] getTradeMatchers() {
+                return new Matcher[]{
+                        new TradeMatcher(DEFAULT_SYMBOL, 145.1, 200),
+                        new TradeMatcher(DEFAULT_SYMBOL, 145.09, 200),
+                        new TradeMatcher(DEFAULT_SYMBOL, 145.08, 200)};
+            }
+        });
+        performTestSteps();
+    }
+
+    /**
+     * Verifies that, when a SELL comes in with a price equal to the price of a resting order, a trade occurs.
+     */
+    @Test
+    public void oldestRestingOrderSoldFirste() {
+        registerTestStep(new ValidOrderTestStep() {
+
+            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
+                orderListBuilder
+//                        .add(createDefaultSellOrder().withPrice(145.09).withQuantity(100).build())
+                        .add(createDefaultSellOrder().withPrice(145.08).withQuantity(200).build())
+                        .add(createDefaultSellOrder().withPrice(145.09).withQuantity(200).build());
+            }
+
+            @Override
+            protected Matcher<Trade>[] getTradeMatchers() {
+                return new Matcher[]{};
+            }
+        });
+
+        registerTestStep(new ValidOrderTestStep() {
+
+            protected void populateOrders(final ImmutableList.Builder<Order> orderListBuilder) {
+                orderListBuilder.add(createDefaultBuyOrder().withPrice(145.05).withQuantity(400).build());
+            }
+
+            @Override
+            protected Matcher<Trade>[] getTradeMatchers() {
+                return new Matcher[]{new TradeMatcher(DEFAULT_SYMBOL, 145.09, 200), new TradeMatcher(DEFAULT_SYMBOL, 145.08, 200)};
             }
         });
         performTestSteps();

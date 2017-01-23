@@ -1,3 +1,5 @@
+package harness;
+
 import com.google.common.collect.Lists;
 import org.joda.time.Seconds;
 import org.junit.After;
@@ -9,8 +11,7 @@ import java.util.List;
 /**
  * Created by adam on 1/22/17.
  */
-public class ExchangeSimulatorTestHarness {
-
+public abstract class ExchangeSimulatorTestHarness {
     private final List<ExchangeSimulatorTestStep> testSteps = Lists.newArrayList();
 
     /**

@@ -20,54 +20,55 @@ import java.util.List;
  */
 public final class ExchangeSimulator {
 
+    private static final long PROCESSING_PERIOD = 1000;
     private static final String SIMULATOR_EXE = "exchange-sim";
+
     private final Process simulator;
     private final BufferedWriter processInputWriter;
-    private final Seconds processingGracePeriod;
+    private final RunnableStreamReader standardOut;
+    private final RunnableStreamReader standardErr;
 
     public SimulationResults processOrders(final List<Order> orders) {
         try {
-            final String commands = translateCommands(orders);
-            System.out.println(commands);
-            processInputWriter.write(commands);
+//            final String commands = translateOrdersToCommandLineInput(orders);
+//            System.out.println(commands);
+            processInputWriter.write(translateOrdersToCommandLineInput(orders));
             processInputWriter.flush();
         } catch (final IOException exception) {
             throw new OrderProcessInputError(exception);
         }
 
-        final RunnableStreamReader standardErr = new RunnableStreamReader(simulator.getErrorStream());
-        final Thread receiveStandardErr = new Thread(standardErr);
-
-        final RunnableStreamReader standardOut = new RunnableStreamReader(simulator.getInputStream());
-        final Thread receiveStandardOut = new Thread(standardOut);
-
-        receiveStandardErr.start();
-        receiveStandardOut.start();
-
-        final long millisToWait = processingGracePeriod.toStandardDuration().getMillis();
+        // Allow time for the background stdout/stderr threads to read process output.
         try {
-            receiveStandardErr.join(millisToWait);
-            receiveStandardOut.join(millisToWait);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
+            Thread.sleep(PROCESSING_PERIOD);
+        } catch (final InterruptedException exception) {
+            System.err.println("Thread interrupted during background processing period.");
+            exception.printStackTrace();
         }
 
-        if (!simulator.isAlive()) {
-            return new SimulationResults(parseTrades(standardOut.getReadLines()), standardErr.getReadLines(), true);
-        }
-        return new SimulationResults(parseTrades(standardOut.getReadLines()), standardErr.getReadLines());
+        final SimulationResults results = new SimulationResults(parseTrades(standardOut.getReadLines()), standardErr.getReadLines(), !simulator.isAlive());
+        standardOut.flush();
+        standardErr.flush();
+        return results;
     }
 
     static ExchangeSimulator createSimulation(final Seconds processingGracePeriod) {
 
-        final Process simulator;
+        final Process simulatorProcess;
         try {
-            simulator = Runtime.getRuntime().exec(SIMULATOR_EXE);
+            simulatorProcess = Runtime.getRuntime().exec(SIMULATOR_EXE);
         } catch (final IOException exception) {
             throw new HarnessInitializationError(exception);
         }
 
-        return new ExchangeSimulator(simulator, new BufferedWriter(new OutputStreamWriter(simulator.getOutputStream())), processingGracePeriod);
+        final ExchangeSimulator simulator = new ExchangeSimulator(simulatorProcess, new BufferedWriter(new OutputStreamWriter(simulatorProcess.getOutputStream())),
+                new RunnableStreamReader(simulatorProcess.getInputStream()), new RunnableStreamReader(simulatorProcess.getErrorStream()));
+
+        // Thread cleanup occurs in the #endSimulation; after simulator.destroy() is called, the input streams are emptied, and the threads return.
+        new Thread(simulator.standardOut).start();
+        new Thread(simulator.standardErr).start();
+
+        return simulator;
     }
 
     void endSimulation() {
@@ -79,7 +80,13 @@ public final class ExchangeSimulator {
         }
     }
 
-    private static String translateCommands(final List<Order> orders) {
+    /**
+     * Parses a List of {@link Order} objects into command-line input.
+     * @param orders List of Orders to parse (cannot be null).
+     * @return Non-null, possibly empty String from the parsed orders.
+     */
+    private static String translateOrdersToCommandLineInput(final List<Order> orders) {
+        assert orders != null : "orders: null";
         final StringBuilder commandBuilder = new StringBuilder();
         for (final Order order : orders) {
             commandBuilder.append(order.getSymbol()).append('|').append(order.getAction()).append('|').append(order.getPrice()).append('|').append(order.getQuantity()).append('\n');
@@ -102,9 +109,10 @@ public final class ExchangeSimulator {
         return translatedTrades.build();
     }
 
-    private ExchangeSimulator(final Process simulator, final BufferedWriter processInputWriter, final Seconds processingGracePeriod) {
+    private ExchangeSimulator(final Process simulator, final BufferedWriter processInputWriter, final RunnableStreamReader standardOut, final RunnableStreamReader standardErr) {
         this.simulator = simulator;
         this.processInputWriter = processInputWriter;
-        this.processingGracePeriod = processingGracePeriod;
+        this.standardOut = standardOut;
+        this.standardErr = standardErr;
     }
 }

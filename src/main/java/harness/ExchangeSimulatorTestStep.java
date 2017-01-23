@@ -1,3 +1,5 @@
+package harness;
+
 import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matcher;
 import simulator.SimulationResults;
@@ -12,7 +14,7 @@ import static org.hamcrest.Matchers.empty;
 /**
  * Created by adam on 1/22/17.
  */
-abstract class ExchangeSimulatorTestStep {
+public abstract class ExchangeSimulatorTestStep {
     private final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness;
 
     public ExchangeSimulatorTestStep(final ExchangeSimulatorTestHarness exchangeSimulatorTestHarness) {
@@ -44,9 +46,9 @@ abstract class ExchangeSimulatorTestStep {
 
         final Matcher<Trade>[] tradeMatchers = getTradeMatchers();
         if (tradeMatchers.length == 0) {
-            assertThat("No trades expected", simulationResults.getOrders(), empty());
+            assertThat("No trades expected", simulationResults.getTrades(), empty());
         } else {
-            assertThat("Expected trades not present or not ordered as expected", simulationResults.getOrders(), contains(tradeMatchers));
+            assertThat("Expected trades not present or not ordered as expected", simulationResults.getTrades(), contains(tradeMatchers));
         }
 
         final Matcher<String>[] warningMatchers = getWarningMatchers();
